@@ -23,13 +23,93 @@ Output
 
 输出最长区域的长度。
 Sample Input
-
 5 5
-1 2 3 4 5
+1  2  3  4  5
 16 17 18 19 6
 15 24 25 20 7
 14 23 22 21 8
 13 12 11 10 9
 Sample Output
-
 25
+
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<vector>
+#include<algorithm>
+#include<iostream>
+using namespace std;
+typedef struct {    //矩阵元素
+	int number;     //数值
+	int i;          //横坐标
+	int j;			//纵坐标
+}element;        
+bool comp(const element &a, const element &b)//对一维矩阵排序用到的比较函数
+{
+	return a.number>b.number;
+}
+int max_length = 0;
+vector<element> arr;         //存放排序的元素
+vector<vector<int> > arr_2d; //存放矩阵
+vector<vector<int> > max_l;  //max_l[i][j]代表从（i,j）开始遍历的最大长度
+int row, column;             //矩阵大小
+
+int recur_go(int i, int j) {
+	int max_length_up =0;     //向上搜寻得到的结果（不包括原节点）
+	int max_length_down = 0;  //向下搜寻得到的结果（不包括原节点）
+	int max_length_left = 0;  //向左搜寻得到的结果（不包括原节点）
+	int max_length_right =0;  //向右搜寻得到的结果（不包括原节点）
+	if (max_l[i][j] != 0) {
+		 return max_l[i][j]; //如果(i,j)的最大长度已经获取过了，直接拿出来就好
+	}
+	if (i>0 && arr_2d[i][j]>arr_2d[i - 1][j]) {//不是边界，左边的小，可以走
+		max_length_up = recur_go(i - 1, j);
+	}
+	if (i<row - 1 && arr_2d[i][j]>arr_2d[i + 1][j]) {
+		max_length_down = recur_go(i + 1, j);
+	}
+	if (j>0 && arr_2d[i][j]>arr_2d[i][j - 1]) {
+		max_length_left = recur_go(i, j - 1);
+	}
+	if (j<column - 1 && arr_2d[i][j]>arr_2d[i][j + 1]) {
+		max_length_right = recur_go(i, j + 1);
+	}
+	//将得到的结果存起来，以便节省时间
+	max_l[i][j]= max(max(max_length_left, max_length_right), max(max_length_down, max_length_up))+1;
+	
+	return max_l[i][j];
+}
+int main() {
+	cin >> row >> column;   //读取矩阵大小，读取矩阵元素存起来
+	for (int i = 0; i<row; i++) {
+		vector<int> temp;
+		vector<int> temp2;
+		for (int j = 0; j<column; j++) {
+			int numm;
+			cin >> numm;
+			temp.push_back(numm);
+			element ele;
+			ele.i = i;
+			ele.number = numm;
+			ele.j = j;
+			arr.push_back(ele);
+			temp2.push_back(0);
+		}
+		arr_2d.push_back(temp);
+		max_l.push_back(temp2);
+	}
+	sort(arr.begin(), arr.end(), comp);//对一维矩阵从大到小排序
+	for (int k =0;k<row*column; k++) { //对一维矩阵遍历，不断刷新max_length求得最大值
+		int tt = recur_go(arr[k].i, arr[k].j);
+		if (tt>max_length) { max_length = tt; }
+	
+	}
+	printf("%d", max_length);
+	return 0;
+}
+体会：vector的越界一定要注意，出错好多次了，vector不能用变量进行初始化。
+      此题采用自顶向下的动态规划DP，
+	  对递归的理解：递归的参数用来向下传值，感觉没什么用，传指针感觉挺有用（扩展欧几里得算法）。
+	  递归层数可以很深，这里10000层没问题。
+	  递归的返回值要注意，父函数使用变量赋值得到子函数的return。
+	  有时候不必把矩阵元素弄成struct的，可以另做一个矩阵，通过下标建立对应也可以达到目的。
