@@ -1,0 +1,81 @@
+Sticks
+Time Limit: 1000MS		Memory Limit: 10000K
+Total Submissions: 151824		Accepted: 36159
+Description
+
+George took sticks of the same length and cut them randomly until all parts became at most 50 units long. Now he wants to return sticks to the original state, but he forgot how many sticks he had originally and how long they were originally. Please help him and design a program which computes the smallest possible original length of those sticks. All lengths expressed in units are integers greater than zero.
+Input
+
+The input contains blocks of 2 lines. The first line contains the number of sticks parts after cutting, there are at most 64 sticks. The second line contains the lengths of those parts separated by the space. The last line of the file contains zero.
+Output
+
+The output should contains the smallest possible length of original sticks, one per line.
+Sample Input
+
+9
+5 2 1 5 2 1 5 2 1
+4
+1 2 3 4
+0
+Sample Output
+
+6
+5
+
+
+
+#include<stdio.h>
+#include<iostream>
+#include<stdlib.h>
+#include<vector>
+#include<math.h>
+#include<algorithm>
+using namespace std;
+int main() {
+	int n;
+	int num;
+	int  a[50];
+	vector<int> f;
+	while (cin>>n && n>0) {
+		for (int i = 0; i < n; i++) {
+			cin>>num;
+			a[i] = num;
+		}
+		int sum = 0;
+		for (int i = 0; i < n; i++) { sum += a[i]; }
+		for (int i = 1; i < sqrt(sum); i++) {
+			if (sum%i == 0) {
+				f.push_back(i);
+				f.push_back(sum / i);
+			}
+		}
+		sort(f.begin(), f.end());
+		vector<int>::iterator it;
+		for (it = f.begin(); it != f.end(); it++) {
+			bool flag[50];
+			for (int i = 0; i < 50; i++)flag[i] = false;
+			for (int i = 0; i < n; i++) {
+				if (flag[i] == false) {
+					if (a[i] == (*it)) { flag[i] = true; }
+					if (a[i] < (*it)) {
+						for (int j = i + 1; j < n; j++) {
+							if (a[j] == ((*it) - a[i]) && flag[j] == false) { flag[j] = true; flag[i] = true; break; }
+						}
+					}
+				}
+			}
+			bool flag2 = false;
+			for (int i = 0; i < n; i++) {
+				if (flag[i] == false) {
+					flag2 = true;
+					break;
+				}
+			}
+			if (flag2 == false) {
+				printf("%d\n", *it);
+				break;
+			}
+		}
+	}
+	return 0;
+}
