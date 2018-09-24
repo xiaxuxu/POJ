@@ -1,0 +1,53 @@
+public class Solution {
+    /**
+     * @param s1: A string
+     * @param s2: A string
+     * @param s3: A string
+     * @return: Determine whether s3 is formed by interleaving of s1 and s2
+     */
+    public  boolean  isInterleave(String s1, String s2, String s3) {
+        if(s3==null)return  false;
+        char[] c1=(s1==null)?new char[0]:s1.toCharArray();
+        char[] c2=(s2==null)?new char[0]:s2.toCharArray();
+        char[] c3=(s3==null)?new char[0]:s3.toCharArray();
+        if (c3.length!=(c1.length+c2.length))
+        {
+            return false;
+        }
+        boolean subfunc = subfunc(c1, 0, c2, 0, c3, 0);
+        return subfunc;
+    }
+
+    public  boolean subfunc(char[] c1,int s1Index,char[] c2,int s2Index,
+                           char[] c3,int s3Index){
+        if(s1Index==c1.length&&s2Index==c2.length){
+            return true;
+        }
+        if (s1Index==c1.length){
+            if(c2[s2Index]==c3[s3Index]){
+                return subfunc(c1,s1Index,c2,
+                        s2Index+1,c3,s3Index+1);
+            }
+            else {
+                return false;
+            }
+        }
+        if(s2Index==c2.length){
+            if(c1[s1Index]==c3[s3Index]){
+                return subfunc(c1,s1Index+1,c2,
+                        s2Index,c3,s3Index+1);
+            }else {
+                return false;
+            }
+        }
+        boolean l1=false,l2=false;
+        if(c1[s1Index]==c3[s3Index]){
+            l1=subfunc(c1,s1Index+1,c2,s2Index,c3,s3Index+1);
+        }
+        if(c2[s2Index]==c3[s3Index]){
+            l2=subfunc(c1,s1Index,c2,s2Index+1,c3,s3Index+1);
+        }
+        return l1||l2;
+    }
+    
+}
